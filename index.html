@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sunset Bingo</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top, #ffd27d 0%, transparent 35%),
+        linear-gradient(160deg, #ff7a45, #ffb347 55%, #ffe0a3);
+      color: #24170f;
+      padding: 24px 14px 40px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 520px;
+      margin: auto;
+    }
+
+    /* CABEÇALHO */
+
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 22px;
+    }
+
+    .header-small {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+
+    .header h1 {
+      margin: 6px 0;
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    /* CARTÃO */
+
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: 0 20px 60px rgba(70, 30, 5, 0.2);
+    }
+
+    /* ECRÃ INICIAL */
+
+    .welcome {
+      text-align: center;
+      padding: 15px 5px 10px;
+    }
+
+    .welcome-icon {
+      font-size: 55px;
+      margin-bottom: 5px;
+    }
+
+    .welcome h2 {
+      margin: 0 0 8px;
+      font-size: 27px;
+    }
+
+    .welcome p {
+      color: #725e50;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    .main-button {
+      width: 100%;
+      border: none;
+      border-radius: 17px;
+      padding: 17px;
+      margin-top: 20px;
+      background: #24170f;
+      color: white;
+      font-size: 17px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .main-button:active {
+      transform: scale(0.98);
+    }
+
+    /* JOGO */
+
+    #gameScreen {
+      display: none;
+    }
+
+    .game-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 15px;
+    }
+
+    .game-top h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .counter {
+      background: #fff0e5;
+      color: #b85425;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 850;
+    }
+
+    /* GRELHA */
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .challenge {
+      background: #fffaf7;
+      border: 2px solid #f0ded2;
+      border-radius: 20px;
+      overflow: hidden;
+      min-height: 205px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .challenge.completed {
+      border-color: #65a85f;
+      background: #f4fbf2;
+    }
+
+    /* FOTO */
+
+    .photo-area {
+      height: 115px;
+      background: linear-gradient(135deg, #ffe3cf, #fff6ed);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      color: #bb805f;
+      font-size: 38px;
+    }
+
+    .photo-area img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* TEXTO DO DESAFIO */
+
+    .challenge-content {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .challenge-number {
+      color: #c96735;
+      font-size: 10px;
+      font-weight: 900;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .challenge-text {
+      font-size: 14px;
+      font-weight: 750;
+      line-height: 1.3;
+      flex: 1;
+    }
+
+    /* BOTÃO FOTO */
+
+    .photo-button {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      padding: 10px 6px;
+      border-radius: 12px;
+      background: #24170f;
+      color: white;
+      font-size: 12px;
+      font-weight: 850;
+      cursor: pointer;
+    }
+
+    .completed .photo-button {
+      background: #4f914a;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    /* BINGO */
+
+    .bingo {
+      display: none;
+      margin-top: 18px;
+      padding: 22px 15px;
+      border-radius: 22px;
+      text-align: center;
+      background: #fff2c6;
+    }
+
+    .bingo.show {
+      display: block;
+      animation: pop 0.4s ease;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0.8);
+        opacity: 0;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .bingo-icon {
+      font-size: 50px;
+    }
+
+    .bingo h3 {
+      font-size: 30px;
+      margin: 5px 0;
+    }
+
+    .bingo p {
+      margin: 0;
+      color: #705b37;
+    }
+
+    /* BOTÕES INFERIORES */
+
+    .secondary-button {
+      width: 100%;
+      border: none;
+      border-radius: 15px;
+      padding: 13px;
+      margin-top: 12px;
+      background: #f3e8df;
+      color: #24170f;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .note {
+      text-align: center;
+      margin-top: 13px;
+      color: #8a7567;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    /* TELEMÓVEIS PEQUENOS */
+
+    @media (max-width: 380px) {
+
+      body {
+        padding: 18px 10px 30px;
+      }
+
+      .card {
+        padding: 14px;
+        border-radius: 22px;
+      }
+
+      .header h1 {
+        font-size: 42px;
+      }
+
+      .challenge {
+        min-height: 190px;
+      }
+
+      .photo-area {
+        height: 100px;
+      }
+
+      .challenge-text {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- CABEÇALHO -->
+
+    <div class="header">
+      <div class="header-small">
+        Receção ao Caloiro 2026
+      </div>
+
+      <h1>🌅 Sunset Bingo</h1>
+
+      <p>4 desafios · 4 fotos · 1 Bingo</p>
+    </div>
+
+
+    <!-- ECRÃ INICIAL -->
+
+    <div class="card" id="startScreen">
+
+      <div class="welcome">
+
+        <div class="welcome-icon">
+          📸
+        </div>
+
+        <h2>Estás pronto?</h2>
+
+        <p>
+          Recebe 4 desafios aleatórios,
+          tira uma fotografia para cada um
+          e completa o teu Bingo!
+        </p>
+
+        <button
+          class="main-button"
+          onclick="startGame()"
+        >
+          🎲 GERAR O MEU BINGO
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ECRÃ DO JOGO -->
+
+    <div class="card" id="gameScreen">
+
+      <div class="game-top">
+
+        <h2>O teu Bingo</h2>
+
+        <div
+          class="counter"
+          id="counter"
+        >
+          0 / 4
+        </div>
+
+      </div>
+
+
+      <!-- OS 4 DESAFIOS -->
+
+      <div
+        class="grid"
+        id="grid"
+      ></div>
+
+
+      <!-- BINGO -->
+
+      <div
+        class="bingo"
+        id="bingo"
+      >
+
+        <div class="bingo-icon">
+          🎉
+        </div>
+
+        <h3>BINGO!</h3>
+
+        <p>
+          Completaste os 4 desafios!
+        </p>
+
+        <button
+          class="main-button"
+          onclick="shareCard()"
+        >
+          📲 PARTILHAR
+        </button>
+
+      </div>
+
+
+      <button
+        class="secondary-button"
+        onclick="newCard()"
+      >
+        🔄 GERAR OUTRO CARTÃO
+      </button>
+
+
+      <div class="note">
+        Versão inicial do Sunset Bingo.
+        As fotografias ficam neste dispositivo.
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    /*
+      OS 16 DESAFIOS
+    */
+
+    const challenges = [
+
+      "Com alguém da AE",
+
+      "Com o DJ",
+
+      "Com um caloiro",
+
+      "Com alguém do 2.º ano",
+
+      "Com alguém do 3.º ano",
+
+      "Com alguém do teu curso",
+
+      "Com alguém da Sal e Tuma",
+
+      "Com alguém da Bagatuna",
+
+      "A beber Bagaço",
+
+      "Com alguém que tenha uma peça de roupa da mesma cor que a tua",
+
+      "Com alguém que esteja a beber o mesmo que tu",
+
+      "A brindar",
+
+      "A beber da blica",
+
+      "Com 5 caloiros",
+
+      "Com um acessório de outra pessoa",
+
+      "Com o teu desenho"
+
+    ];
+
+
+    /*
+      CARTÃO ATUAL
+    */
+
+    let selectedChallenges = [];
+
+
+    /*
+      ESCOLHER 4 DESAFIOS ALEATÓRIOS
+    */
+
+    function generateChallenges() {
+
+      const shuffled = [...challenges];
+
+      shuffled.sort(() => Math.random() - 0.5);
+
+      return shuffled
+        .slice(0, 4)
+        .map(text => {
+
+          return {
+            text: text,
+            photo: null
+          };
+
+        });
+
+    }
+
+
+    /*
+      COMEÇAR O JOGO
+    */
+
+    function startGame() {
+
+      document
+        .getElementById("startScreen")
+        .style.display = "none";
+
+      document
+        .getElementById("gameScreen")
+        .style.display = "block";
+
+      selectedChallenges = generateChallenges();
+
+      renderCard();
+
+    }
+
+
+    /*
+      GERAR NOVO CARTÃO
+    */
+
+    function newCard() {
+
+      selectedChallenges = generateChallenges();
+
+      document
+        .getElementById("bingo")
+        .classList
+        .remove("show");
+
+      renderCard();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+
+    }
+
+
+    /*
+      MOSTRAR O CARTÃO
+    */
+
+    function renderCard() {
+
+      const grid =
+        document.getElementById("grid");
+
+      grid.innerHTML = "";
+
+
+      selectedChallenges.forEach(
+        (challenge, index) => {
+
+          const element =
+            document.createElement("div");
+
+          element.className =
+            "challenge" +
+            (challenge.photo
+              ? " completed"
+              : "");
+
+
+          element.innerHTML = `
+
+            <div
+              class="photo-area"
+              id="photo-${index}"
+            >
+
+              ${
+                challenge.photo
+                  ? `<img
+                       src="${challenge.photo}"
+                       alt="Fotografia do desafio"
+                     >`
+                  : "📸"
+              }
+
+            </div>
+
+
+            <div class="challenge-content">
+
+              <div class="challenge-number">
+                Desafio ${index + 1}
+              </div>
+
+              <div class="challenge-text">
+                ${challenge.text}
+              </div>
+
+
+              <label class="photo-button">
+
+                ${
+                  challenge.photo
+                    ? "📸 TROCAR FOTO"
+                    : "📸 TIRAR FOTO"
+                }
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onchange="handlePhoto(event, ${index})"
+                >
+
+              </label>
+
+            </div>
+
+          `;
+
+
+          grid.appendChild(element);
+
+        }
+      );
+
+
+      updateCounter();
+
+    }
+
+
+    /*
+      RECEBER A FOTOGRAFIA
+    */
+
+    function handlePhoto(event, index) {
+
+      const file =
+        event.target.files[0];
+
+      if (!file) {
+        return;
+      }
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload = function(e) {
+
+        selectedChallenges[index].photo =
+          e.target.result;
+
+
+        renderCard();
+
+
+        checkBingo();
+
+      };
+
+
+      reader.readAsDataURL(file);
+
+    }
+
+
+    /*
+      ATUALIZAR CONTADOR
+    */
+
+    function updateCounter() {
+
+      const completed =
+        selectedChallenges
+          .filter(challenge => challenge.photo)
+          .length;
+
+
+      document
+        .getElementById("counter")
+        .textContent =
+          `${completed} / 4`;
+
+    }
+
+
+    /*
+      VERIFICAR SE FEZ BINGO
+    */
+
+    function checkBingo() {
+
+      const completed =
+        selectedChallenges
+          .filter(challenge => challenge.photo)
+          .length;
+
+
+      if (completed === 4) {
+
+        document
+          .getElementById("bingo")
+          .classList
+          .add("show");
+
+
+        setTimeout(() => {
+
+          window.scrollTo({
+            top: document.body.scrollHeight,
+            behavior: "smooth"
+          });
+
+        }, 150);
+
+      }
+
+    }
+
+
+    /*
+      PARTILHAR
+    */
+
+    async function shareCard() {
+
+      const text =
+        "🎉 Fiz o Sunset Bingo da Receção ao Caloiro e consegui BINGO! 🌅📸";
+
+
+      if (navigator.share) {
+
+        try {
+
+          await navigator.share({
+            title: "Sunset Bingo",
+            text: text
+          });
+
+        } catch (error) {
+
+          console.log("Partilha cancelada.");
+
+        }
+
+      } else {
+
+        alert(
+          "BINGO! 🎉\n\n" +
+          "Na próxima versão vamos criar " +
+          "um cartão final em imagem para " +
+          "poderes guardar e publicar."
+        );
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
